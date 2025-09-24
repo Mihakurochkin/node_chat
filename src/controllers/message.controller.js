@@ -6,6 +6,12 @@ const getAll = async (req, res) => {
   res.send(messages);
 };
 
+const getByRoom = async (req, res) => {
+  const messages = await messageService.getByRoom(req.params.roomId);
+
+  res.send(messages);
+};
+
 const add = async (req, res) => {
   try {
     const messageData = req.body;
@@ -16,14 +22,14 @@ const add = async (req, res) => {
   }
 };
 
-const deleteMessage = async (req, res) => {
+const deleteByRoom = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deleted = await messageService.deleteMessage(id);
+    const { roomId } = req.params;
+    const deleted = await messageService.deleteByRoom(roomId);
     if (deleted) {
-      res.status(200).send({ message: 'Message deleted successfully' });
+      res.status(200);
     } else {
-      res.status(404).send({ error: 'Message not found' });
+      res.status(404);
     }
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -32,6 +38,7 @@ const deleteMessage = async (req, res) => {
 
 export const messageController = {
   getAll,
+  getByRoom,
   add,
-  deleteMessage,
+  deleteByRoom,
 };

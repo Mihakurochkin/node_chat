@@ -1,23 +1,29 @@
 import { Message } from '../models/Message.js';
 
-async function getAll() {
+const getAll = async () => {
   const result = await Message.findAll();
   return result;
-}
-
-const add = async ({ text }) => {
-  return await Message.create({ text });
 };
 
-const deleteMessage = async (id) => {
+const getByRoom = async (roomId) => {
+  const result = await Message.findAll({ where: { roomId } });
+  return result;
+};
+
+const add = async (message) => {
+  return await Message.create(message);
+};
+
+const deleteByRoom = async (roomId) => {
   const deletedCount = await Message.destroy({
-    where: { id },
+    where: { roomId },
   });
   return deletedCount > 0;
 };
 
 export const messageService = {
   getAll,
+  getByRoom,
   add,
-  deleteMessage,
+  deleteByRoom,
 };
