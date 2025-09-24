@@ -56,15 +56,15 @@ wss.on('connection', (connection) => {
             return;
           }
           
-          connectionRooms.set(connection, roomId);
+          connectionRooms.set(connection, id);
           
           connection.send(JSON.stringify({
             type: 'join-success',
-            roomId: roomId,
+            roomId: id,
             message: 'Successfully joined room'
           }));
           
-          const history = await messageService.getByRoom(roomId);
+          const history = await messageService.getByRoom(id);
           connection.send(JSON.stringify({
             type: 'history',
             messages: history.reverse()
