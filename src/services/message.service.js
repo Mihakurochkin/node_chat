@@ -11,7 +11,12 @@ const getByRoom = async (roomId) => {
 };
 
 const add = async (message) => {
-  return await Message.create(message);
+  try {
+    const newMessage = await Message.create(message);
+    return newMessage;
+  } catch (error) {
+    throw new Error('Failed to add message: ' + error.message);
+  }
 };
 
 const deleteByRoom = async (roomId) => {

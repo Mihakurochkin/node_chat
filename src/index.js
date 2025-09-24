@@ -21,9 +21,9 @@ const server = app.listen(PORT);
 const wss = new WebSocketServer({ server });
 
 function broadcastMessage(message) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(message));
+  wss.clients.forEach((cl) => {
+    if (cl.readyState === cl.OPEN) {
+      cl.send(JSON.stringify(message));
     }
   });
 }
@@ -36,7 +36,6 @@ wss.on('connection', (connection) => {
 
       broadcastMessage(newMessage);
     } catch (error) {
-      console.error('Failed to process message:', error);
       connection.send(
         JSON.stringify({ error: 'Invalid message format or server error.' }),
       );

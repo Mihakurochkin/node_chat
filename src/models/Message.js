@@ -25,7 +25,7 @@ export const Message = client.define(
         model: Room,
         key: 'id',
       },
-    }
+    },
   },
   {
     tableName: 'messages',

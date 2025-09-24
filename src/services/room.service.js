@@ -6,7 +6,12 @@ const getAll = async () => {
 };
 
 const add = async (room) => {
-  return await Room.create(room);
+  try {
+    const newRoom = await Room.create(room);
+    return newRoom;
+  } catch (error) {
+    throw new Error('Failed to add room: ' + error.message);
+  }
 };
 
 const rename = async (name, id) => {
@@ -22,7 +27,6 @@ const deleteRoom = async (id) => {
   const deletedCount = await Room.destroy({
     where: { id },
   });
-  console.log(deletedCount > 0);
   return deletedCount > 0;
 };
 
