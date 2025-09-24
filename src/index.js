@@ -24,9 +24,9 @@ const wss = new WebSocketServer({ server });
 const connectionRooms = new Map();
 
 function broadcastToRoom(message, roomId) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === client.OPEN && connectionRooms.get(client) === roomId) {
-      client.send(JSON.stringify(message));
+  wss.clients.forEach((cl) => {
+    if (cl.readyState === cl.OPEN && connectionRooms.get(cl) === roomId) {
+      cl.send(JSON.stringify(message));
     }
   });
 }
@@ -42,11 +42,11 @@ wss.on('connection', (connection) => {
       }
       
       if (messageData.type === 'join') {
-        const roomId = messageData.roomId;
+        const id = messageData.roomId;
         
         try {
           const rooms = await roomService.getAll();
-          const roomExists = rooms.some(room => room.id === roomId);
+          const roomExists = rooms.some(room => room.id === id);
           
           if (!roomExists) {
             connection.send(JSON.stringify({

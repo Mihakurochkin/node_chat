@@ -41,6 +41,25 @@ const deleteRoom = async (req, res) => {
   }
 };
 
+const joinRoom = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rooms = await roomService.getAll();
+    const room = rooms.find(r => r.id === parseInt(id));
+    
+    if (!room) {
+      return res.status(404).send({ error: 'Room not found' });
+    }
+    
+    res.status(200).send({ 
+      message: 'Successfully joined room',
+      room: room 
+    });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
 export const roomController = {
   getAll,
   add,
