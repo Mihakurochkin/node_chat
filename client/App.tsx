@@ -73,7 +73,11 @@ const App: React.FC = () => {
     })
       .then(response => response.json())
       .then(data => {
-        rooms.find(item => item.id === data.id)!.name = data.name;
+        setRooms((prev) =>
+          prev.map((room) =>
+            room.id === data.id ? { ...room, name: data.name } : room
+          )
+        );
       })
       .then(() => {
         setRoomRenameInputValue('');
@@ -109,27 +113,66 @@ const App: React.FC = () => {
       })
       .catch(error => console.log(error));
 
-    
+
   }
 
   const handleJoinRoom = (id: number) => {
-    setCurrentRoom(id);
+    fetch(`http://localhost:3005/rooms/${id}/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Room not found or join failed');
+        }
+      })
+      .then(data => {
+        console.log('Room join confirmed:', data.message);
+        setCurrentRoom(id);
 
-    fetch(`http://localhost:3005/messages/${id}`)
+        if (socket) {
+          socket.send(JSON.stringify({
+            type: 'join',
+            roomId: id
+          }));
+        }
+
+        return fetch(`http://localhost:3005/messages/${id}`);
+      })
       .then(response => response.json())
       .then(data => setMessages(data.reverse()))
-      .catch(err => console.log(err));
   }
 
   useEffect(() => {
     const newSocket = new WebSocket('ws://localhost:3005');
 
     newSocket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      setMessages(prev => [message, ...prev]);
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'history') {
+        setMessages(data.messages);
+        return;
+      }
+
+      if (data.type === 'join-success' || data.type === 'join-error') return;
+
+      setMessages(prev => [data, ...prev]);
     };
 
     setSocket(newSocket);
+
+    if (currentRoom) {
+      newSocket.onopen = () => {
+        newSocket.send(JSON.stringify({
+          type: 'join',
+          roomId: currentRoom
+        }));
+      };
+    }
 
     return () => newSocket.close();
   }, [currentRoom]);
@@ -143,7 +186,7 @@ const App: React.FC = () => {
 
   return (
     <div className="messager">
-      <Username username={username} setUsername={setUsername} />
+      <Username username={username} setUsername={setUsername} socket={socket} />
       <ul className="messages">
         {messages.map(message => (
           <li key={message.id}>

@@ -27,9 +27,9 @@ const deleteByRoom = async (req, res) => {
     const { roomId } = req.params;
     const deleted = await messageService.deleteByRoom(roomId);
     if (deleted) {
-      res.status(200);
+      res.sendStatus(200);
     } else {
-      res.status(404);
+      res.status(404).send({ error: 'Messages for this room not found' });
     }
   } catch (error) {
     res.status(500).send({ error: error.message });

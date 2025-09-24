@@ -18,7 +18,10 @@ const add = async (req, res) => {
 const rename = async (req, res) => {
   try {
     const renamedRoom = await roomService.rename(req.body.name, req.params.id);
-    res.status(201).send(renamedRoom);
+    if (!renamedRoom) {
+      return res.status(404).send({ error: 'Room not found' });
+    }
+    res.status(200).send(renamedRoom);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -43,4 +46,5 @@ export const roomController = {
   add,
   rename,
   deleteRoom,
+  joinRoom,
 };
